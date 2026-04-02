@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TB_PRODUTO")
@@ -20,6 +21,14 @@ public class ProdutoModel implements Serializable {
 
     @Column(nullable = false)
     private BigDecimal valor;
+
+    @Column(name = "data_cadastro", updatable = false, nullable = false)
+    private LocalDateTime dataCadastro;
+
+    @PrePersist
+    public void prePersist() {
+        this.dataCadastro = LocalDateTime.now();
+    }
 
     public Long getIdProduto() {
         return idProduto;
@@ -43,5 +52,13 @@ public class ProdutoModel implements Serializable {
 
     public void setValor(BigDecimal valor) {
         this.valor = valor;
+    }
+
+    public LocalDateTime getDataCadastro() {
+        return dataCadastro;
+    }
+
+    public void setDataCadastro(LocalDateTime dataCadastro) {
+        this.dataCadastro = dataCadastro;
     }
 }

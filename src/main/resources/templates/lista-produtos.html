@@ -40,6 +40,7 @@
                         <th>ID</th>
                         <th>Nome</th>
                         <th>Valor</th>
+                        <th>Data do cadastro</th>
                         <th class="text-center">Ações</th>
                     </tr>
                     </thead>
@@ -47,7 +48,9 @@
                     <tr th:each="p : ${produtos}">
                         <td th:text="${p.idProduto}"></td>
                         <td th:text="${p.nome}"></td>
-                        <td th:text="${#numbers.formatDecimal(p.valor, 1, 'POINT', 2, 'COMMA')}"></td>
+                        <td th:text="${#numbers.formatDecimal(p.valor, 1, 'POINT', 2, 'COMMA')}"
+                            th:classappend="${p.valor > 1000} ? 'text-danger fw-bold' : ''"></td>
+                        <td th:text="${#temporals.format(p.dataCadastro, 'dd/MM/yyyy HH:mm')}"></td>
                         <td class="text-center">
                             <a th:href="@{/produtos/editar/{id}(id=${p.idProduto})}" class="btn btn-warning btn-sm">Editar</a>
                             <a th:href="@{/produtos/excluir/{id}(id=${p.idProduto})}" class="btn btn-danger btn-sm"
@@ -55,7 +58,7 @@
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(produtos)}">
-                        <td colspan="4" class="text-center text-muted">Nenhum produto cadastrado.</td>
+                        <td colspan="5" class="text-center text-muted">Nenhum produto cadastrado.</td>
                     </tr>
                     </tbody>
                 </table>

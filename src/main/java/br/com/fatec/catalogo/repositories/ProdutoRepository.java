@@ -6,7 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface ProdutoRepository extends JpaRepository<ProdutoModel, Long> {
-    List<ProdutoModel>findByNomeContainingIgnoreCase(String nome);
+
+    List<ProdutoModel> findByNomeContainingIgnoreCase(String nome);
+
+    boolean existsByNomeIgnoreCase(String nome);
 }
 

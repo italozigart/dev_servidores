@@ -32,9 +32,15 @@ public class ProdutoController {
     }
 
     @PostMapping("/produtos/novo")
-    public String salvarProduto(@ModelAttribute ProdutoModel produto) {
-        service.salvar(produto);
-        return "redirect:/produtos";
+    public String salvarProduto(@ModelAttribute ProdutoModel produto, Model model) {
+        try {
+            service.salvar(produto);
+            return "redirect:/produtos";
+        } catch (RuntimeException e) {
+            model.addAttribute("produto", produto);
+            model.addAttribute("erro", e.getMessage());
+            return "cadastro-produto";
+        }
     }
 
     @GetMapping("/produtos/editar/{id}")

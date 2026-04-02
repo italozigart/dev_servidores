@@ -30,6 +30,16 @@ public class ProdutoService {
     }
 
     public ProdutoModel salvar(ProdutoModel produto) {
+        if (produto.getNome() == null || produto.getNome().trim().isEmpty()) {
+            throw new RuntimeException("O nome do produto é obrigatório.");
+        }
+
+        if (repository.existsByNomeIgnoreCase(produto.getNome().trim())) {
+            throw new RuntimeException("Já existe um produto cadastrado com esse nome.");
+        }
+
+        produto.setNome(produto.getNome().trim());
+
         return repository.save(produto);
     }
 
