@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-br"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,22 +12,31 @@
 <nav class="navbar navbar-dark bg-primary mb-4">
     <div class="container">
         <a class="navbar-brand" th:href="@{/produtos}">FATEC - Catálogo</a>
+        <div class="d-flex align-items-center gap-3">
+            <span sec:authorize="isAuthenticated()" class="text-white small">
+                Olá, <strong sec:authentication="name"></strong>
+                <span sec:authorize="hasRole('ADMIN')" class="badge bg-warning text-dark ms-1">ADMIN</span>
+                <span sec:authorize="hasRole('USER') and !hasRole('ADMIN')" class="badge bg-light text-dark ms-1">USER</span>
+            </span>
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="mb-0">
+                <button type="submit" class="btn btn-outline-light btn-sm">Sair</button>
+            </form>
+            <a sec:authorize="!isAuthenticated()" th:href="@{/login}" class="btn btn-outline-light btn-sm">Entrar</a>
+        </div>
     </div>
 </nav>
-
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0">Lista de Produtos</h1>
-        <a th:href="@{/produtos/novo}" class="btn btn-success">Novo Produto</a>
+        <div class="d-flex gap-2">
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/usuarios}" class="btn btn-outline-secondary">Gerenciar Usuários</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/produtos/novo}" class="btn btn-success">Novo Produto</a>
+        </div>
     </div>
     <div class="row mb-4">
         <div class="col-md-6">
             <form th:action="@{/produtos}" method="get" class="d-flex gap-2">
-                <input type="text"
-                       name="nome"
-                       class="form-control"
-                       placeholder="Pesquisar por nome..."
-                       th:value="${param.nome}">
+                <input type="text" name="nome" class="form-control" placeholder="Pesquisar por nome..." th:value="${param.nome}">
                 <button type="submit" class="btn btn-primary">Buscar</button>
                 <a th:href="@{/produtos}" class="btn btn-outline-secondary">Limpar</a>
             </form>
@@ -40,8 +51,8 @@
                         <th>ID</th>
                         <th>Nome</th>
                         <th>Valor</th>
-                        <th>Data do cadastro</th>
-                        <th class="text-center">Ações</th>
+                        <th>Data do Cadastro</th>
+                        <th sec:authorize="hasRole('ADMIN')" class="text-center">Ações</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -51,7 +62,7 @@
                         <td th:text="${#numbers.formatDecimal(p.valor, 1, 'POINT', 2, 'COMMA')}"
                             th:classappend="${p.valor > 1000} ? 'text-danger fw-bold' : ''"></td>
                         <td th:text="${#temporals.format(p.dataCadastro, 'dd/MM/yyyy HH:mm')}"></td>
-                        <td class="text-center">
+                        <td sec:authorize="hasRole('ADMIN')" class="text-center">
                             <a th:href="@{/produtos/editar/{id}(id=${p.idProduto})}" class="btn btn-warning btn-sm">Editar</a>
                             <a th:href="@{/produtos/excluir/{id}(id=${p.idProduto})}" class="btn btn-danger btn-sm"
                                onclick="return confirm('Deseja realmente excluir este produto?')">Excluir</a>

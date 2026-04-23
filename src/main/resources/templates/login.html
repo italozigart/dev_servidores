@@ -12,9 +12,8 @@
         <a class="navbar-brand" th:href="@{/produtos}">FATEC - Catálogo</a>
     </div>
 </nav>
-
 <div class="container">
-    <div class="card shadow mx-auto" style="max-width: 500px;">
+    <div class="card shadow mx-auto" style="max-width: 460px;">
         <div class="card-header bg-white">
             <h2 class="mb-0">Login</h2>
         </div>
@@ -22,27 +21,26 @@
             <form th:action="@{/login}" method="post">
                 <div class="mb-3">
                     <label for="username" class="form-label">Usuário</label>
-                    <input type="text" class="form-control" id="username" name="username" required>
+                    <input type="text" class="form-control" id="username" name="username" required autofocus>
                 </div>
-
                 <div class="mb-3">
                     <label for="password" class="form-label">Senha</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
-
                 <div th:if="${param.error}" class="alert alert-danger">
                     Usuário ou senha inválidos.
                 </div>
-
                 <div th:if="${param.logout}" class="alert alert-success">
                     Logout realizado com sucesso.
                 </div>
-
                 <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-success">Entrar</button>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
                     <a th:href="@{/produtos}" class="btn btn-outline-secondary">Voltar</a>
                 </div>
             </form>
+        </div>
+        <div class="card-footer text-muted small">
+            <strong>Admin:</strong> admin / 123456 &nbsp;|&nbsp; <strong>Usuário:</strong> aluno / 123456
         </div>
     </div>
 </div>

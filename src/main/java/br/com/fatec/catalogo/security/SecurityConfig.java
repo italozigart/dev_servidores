@@ -1,53 +1,66 @@
 package br.com.fatec.catalogo.security;
 
+import br.com.fatec.catalogo.services.UsuarioService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/produtos").permitAll()
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers("/produtos/novo", "/produtos/editar/**", "/produtos/deletar/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
-                .formLogin(form -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/produtos", true)
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/produtos")
-                        .permitAll()
-                );
+    private final UsuarioService usuarioService;
 
-        return http.build();
+    public SecurityConfig(@Lazy UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails admin = org.springframework.security.core.userdetails.User.builder()
-                .username("admin")
-                .password("{noop}123456")
-                .roles("ADMIN")
-                .build();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-        UserDetails user = org.springframework.security.core.userdetails.User.builder()
-                .username("aluno")
-                .password("{noop}123456")
-                .roles("USER")
-                .build();
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(usuarioService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
 
-        return new org.springframework.security.provisioning.InMemoryUserDetailsManager(user, admin);
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers(new AntPathRequestMatchers("/h2-console/**")))
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.sameOrigin())
+                )
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/h2-console/**").permitAll()
+                .requestMatchers("/usuarios/**").hasRole("ADMIN")
+                .requestMatchers("/produtos").permitAll()
+                .requestMatchers("/produtos/novo, produtos/editar/**", "/produtos/excluir").hasRole("ADMIN")
+                .anyRequest().authenticated()
+            )
+            .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/produtos", true)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutSuccessUrl("/produtos")
+                .permitAll()
+            )
+            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+
+        return http.build();
     }
 }
