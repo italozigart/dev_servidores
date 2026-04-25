@@ -1,6 +1,7 @@
 package br.com.fatec.catalogo.controllers;
 
 import br.com.fatec.catalogo.models.ProdutoModel;
+import br.com.fatec.catalogo.repositories.CategoriaRepository;
 import br.com.fatec.catalogo.services.ProdutoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +13,9 @@ public class ProdutoController {
 
     @Autowired
     private ProdutoService service;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
 
     @GetMapping("/")
     public String redirecionarParaProdutos() {
@@ -28,6 +32,7 @@ public class ProdutoController {
     @GetMapping("/produtos/novo")
     public String abrirCadastro(Model model) {
         model.addAttribute("produto", new ProdutoModel());
+        model.addAttribute("categorias", categoriaRepository.findAll());
         return "cadastro-produto";
     }
 
@@ -38,6 +43,7 @@ public class ProdutoController {
             return "redirect:/produtos";
         } catch (RuntimeException e) {
             model.addAttribute("produto", produto);
+            model.addAttribute("categorias", categoriaRepository.findAll());
             model.addAttribute("erro", e.getMessage());
             return "cadastro-produto";
         }
@@ -47,14 +53,24 @@ public class ProdutoController {
     public String abrirEdicao(@PathVariable Long id, Model model) {
         ProdutoModel produto = service.buscarPorId(id);
         model.addAttribute("produto", produto);
+        model.addAttribute("categorias", categoriaRepository.findAll());
         return "editar-produto";
     }
 
     @PostMapping("/produtos/editar/{id}")
-    public String atualizarProduto(@PathVariable Long id, @ModelAttribute ProdutoModel produto) {
-        produto.setIdProduto(id);
-        service.salvar(produto);
-        return "redirect:/produtos";
+    public String atualizarProduto(@PathVariable Long id,
+                                   @ModelAttribute ProdutoModel produto,
+                                   Model model) {
+        try {
+            produto.setIdProduto(id);
+            service.salvar(produto);
+            return "redirect:/produtos";
+        } catch (RuntimeException e) {
+            model.addAttribute("produto", produto);
+            model.addAttribute("categorias", categoriaRepository.findAll());
+            model.addAttribute("erro", e.getMessage());
+            return "editar-produto";
+        }
     }
 
     @GetMapping("/produtos/excluir/{id}")

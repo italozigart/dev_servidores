@@ -1,3 +1,0 @@
-INSERT INTO TB_CATEGORIA (nome) VALUES ('Notebooks');
-INSERT INTO TB_CATEGORIA (nome) VALUES ('PC Montado');
-INSERT INTO TB_CATEGORIA (nome) VALUES ('Periféricos');

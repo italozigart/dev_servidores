@@ -30,6 +30,7 @@
         <h1 class="h3 mb-0">Lista de Produtos</h1>
         <div class="d-flex gap-2">
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/usuarios}" class="btn btn-outline-secondary">Gerenciar Usuários</a>
+            <a sec:authorize="hasRole('ADMIN')" th:href="@{/categorias}" class="btn btn-outline-primary">Gerenciar Categorias</a>
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/produtos/novo}" class="btn btn-success">Novo Produto</a>
         </div>
     </div>

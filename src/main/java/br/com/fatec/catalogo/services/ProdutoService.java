@@ -6,7 +6,6 @@ import br.com.fatec.catalogo.repositories.ProdutoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProdutoService {
@@ -28,6 +27,7 @@ public class ProdutoService {
         if (nome == null || nome.isBlank()) {
             return produtoRepository.findAll();
         }
+
         return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }
 
@@ -37,6 +37,28 @@ public class ProdutoService {
     }
 
     public ProdutoModel salvar(ProdutoModel produto) {
+        if (produto.getNome() == null || produto.getNome().isBlank()) {
+            throw new RuntimeException("O nome do produto é obrigatório.");
+        }
+
+        if (produto.getValor() == null) {
+            throw new RuntimeException("O valor do produto é obrigatório.");
+        }
+
+        if (produto.getCategoria() == null || produto.getCategoria().getIdCategoria() == null) {
+            throw new RuntimeException("A categoria do produto é obrigatória.");
+        }
+
+        categoriaRepository.findById(produto.getCategoria().getIdCategoria())
+                .orElseThrow(() -> new RuntimeException("Categoria não encontrada."));
+
+        if (produto.getIdProduto() != null) {
+            ProdutoModel produtoExistente = produtoRepository.findById(produto.getIdProduto())
+                    .orElseThrow(() -> new RuntimeException("Produto não encontrado."));
+
+            produto.setDataCadastro(produtoExistente.getDataCadastro());
+        }
+
         return produtoRepository.save(produto);
     }
 
