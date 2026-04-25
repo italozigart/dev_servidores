@@ -1,49 +1,46 @@
 package br.com.fatec.catalogo.services;
 
 import br.com.fatec.catalogo.models.ProdutoModel;
+import br.com.fatec.catalogo.repositories.CategoriaRepository;
 import br.com.fatec.catalogo.repositories.ProdutoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProdutoService {
 
-    @Autowired
-    private ProdutoRepository repository;
+    private final ProdutoRepository produtoRepository;
+    private final CategoriaRepository categoriaRepository;
+
+    public ProdutoService(ProdutoRepository produtoRepository,
+                          CategoriaRepository categoriaRepository) {
+        this.produtoRepository = produtoRepository;
+        this.categoriaRepository = categoriaRepository;
+    }
 
     public List<ProdutoModel> listarTodos() {
-        return repository.findAll();
+        return produtoRepository.findAll();
     }
 
     public List<ProdutoModel> buscarPorNome(String nome) {
-        if (nome == null || nome.trim().isEmpty()) {
-            return repository.findAll();
+        if (nome == null || nome.isBlank()) {
+            return produtoRepository.findAll();
         }
-
-        return repository.findByNomeContainingIgnoreCase(nome);
+        return produtoRepository.findByNomeContainingIgnoreCase(nome);
     }
 
     public ProdutoModel buscarPorId(Long id) {
-        return repository.findById(id).orElseThrow();
+        return produtoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + id));
     }
 
     public ProdutoModel salvar(ProdutoModel produto) {
-        if (produto.getNome() == null || produto.getNome().trim().isEmpty()) {
-            throw new RuntimeException("O nome do produto é obrigatório.");
-        }
-
-        if (repository.existsByNomeIgnoreCase(produto.getNome().trim())) {
-            throw new RuntimeException("Já existe um produto cadastrado com esse nome.");
-        }
-
-        produto.setNome(produto.getNome().trim());
-
-        return repository.save(produto);
+        return produtoRepository.save(produto);
     }
 
     public void excluir(Long id) {
-        repository.deleteById(id);
+        produtoRepository.deleteById(id);
     }
 }

@@ -1,7 +1,6 @@
 package br.com.fatec.catalogo.models;
 
 import jakarta.persistence.*;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,40 +24,27 @@ public class ProdutoModel implements Serializable {
     @Column(name = "data_cadastro", updatable = false, nullable = false)
     private LocalDateTime dataCadastro;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_categoria", nullable = false)
+    private CategoriaModel categoria;
+
     @PrePersist
     public void prePersist() {
         this.dataCadastro = LocalDateTime.now();
     }
 
-    public Long getIdProduto() {
-        return idProduto;
-    }
+    public Long getIdProduto() { return idProduto; }
+    public void setIdProduto(Long idProduto) { this.idProduto = idProduto; }
 
-    public void setIdProduto(Long idProduto) {
-        this.idProduto = idProduto;
-    }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 
-    public String getNome() {
-        return nome;
-    }
+    public BigDecimal getValor() { return valor; }
+    public void setValor(BigDecimal valor) { this.valor = valor; }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    public LocalDateTime getDataCadastro() { return dataCadastro; }
+    public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 
-    public BigDecimal getValor() {
-        return valor;
-    }
-
-    public void setValor(BigDecimal valor) {
-        this.valor = valor;
-    }
-
-    public LocalDateTime getDataCadastro() {
-        return dataCadastro;
-    }
-
-    public void setDataCadastro(LocalDateTime dataCadastro) {
-        this.dataCadastro = dataCadastro;
-    }
+    public CategoriaModel getCategoria() { return categoria; }
+    public void setCategoria(CategoriaModel categoria) { this.categoria = categoria; }
 }

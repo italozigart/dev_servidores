@@ -37,29 +37,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers(new AntPathRequestMatchers("/h2-console/**")))
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.sameOrigin())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/usuarios/**").hasRole("ADMIN")
+                        .requestMatchers("/produtos").permitAll()
+                        .requestMatchers("/produtos/novo", "/produtos/editar/**", "/produtos/excluir").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
-            .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/usuarios/**").hasRole("ADMIN")
-                .requestMatchers("/produtos").permitAll()
-                .requestMatchers("/produtos/novo, produtos/editar/**", "/produtos/excluir").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .defaultSuccessUrl("/produtos", true)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutSuccessUrl("/produtos")
-                .permitAll()
-            )
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()))
-            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/produtos", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/produtos")
+                        .permitAll()
+                );
 
         return http.build();
     }
